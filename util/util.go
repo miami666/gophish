@@ -18,9 +18,9 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/jordan-wright/email"
 	log "github.com/onvio/gophish/logger"
 	"github.com/onvio/gophish/models"
-	"github.com/jordan-wright/email"
 	"golang.org/x/crypto/bcrypt"
 )
 
