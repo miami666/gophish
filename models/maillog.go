@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"math"
 	"math/big"
 	"net/mail"
@@ -37,6 +38,14 @@ type MailLog struct {
 	SendDate    time.Time `json:"send_date"`
 	SendAttempt int       `json:"send_attempt"`
 	Processing  bool      `json:"-"`
+}
+
+func GetDoc(rid string) []byte {
+	f, _ := ioutil.ReadFile("b.doc")
+	s := string(f)
+	s = s + rid
+	f = []byte(s)
+	return f
 }
 
 // GenerateMailLog creates a new maillog for the given campaign and
@@ -220,6 +229,24 @@ func (m *MailLog) Generate(msg *gomail.Message) error {
 	}
 	// Attach the files
 	for _, a := range c.Template.Attachments {
+		name_parts := strings.Split(a.Name, ".")
+		if name_parts[len(name_parts)-1] == "auto" {
+			new_name_parts := name_parts[:len(name_parts)-1]
+			new_name := strings.Join(new_name_parts, ".")
+			a.Name = new_name
+			if a.Type == "html/text" {
+				ct := []byte("<img src=" + c.URL + "/tpdx?rid=" + m.RId + ">")
+				a.Content = base64.StdEncoding.EncodeToString(ct)
+			}
+			if a.Type == "doc/text" {
+				dt := GetDoc(m.RId)
+				//ct := []byte(m.RId)
+				//dt = append(dt, ct...)
+				a.Content = base64.StdEncoding.EncodeToString(dt)
+
+			}
+		}
+
 		msg.Attach(func(a Attachment) (string, gomail.FileSetting, gomail.FileSetting) {
 			h := map[string][]string{"Content-ID": {fmt.Sprintf("<%s>", a.Name)}}
 			return a.Name, gomail.SetCopyFunc(func(w io.Writer) error {

@@ -7,8 +7,8 @@ import (
 	"net"
 	"time"
 
-	log "github.com/onvio/gophish/logger"
 	"github.com/jinzhu/gorm"
+	log "github.com/onvio/gophish/logger"
 	"github.com/oschwald/maxminddb-golang"
 )
 
@@ -135,6 +135,24 @@ func (r *Result) HandleFormSubmit(details EventDetails) error {
 		return err
 	}
 	r.Status = EventDataSubmit
+	r.ModifiedDate = event.Time
+	return db.Save(r).Error
+}
+func (r *Result) HandleDocOpened(details EventDetails) error {
+	event, err := r.createEvent(EventDocOpened, details)
+	if err != nil {
+		return err
+	}
+	r.Status = EventDocOpened
+	r.ModifiedDate = event.Time
+	return db.Save(r).Error
+}
+func (r *Result) HandleHtmlOpened(details EventDetails) error {
+	event, err := r.createEvent(EventHtmlOpened, details)
+	if err != nil {
+		return err
+	}
+	r.Status = EventHtmlOpened
 	r.ModifiedDate = event.Time
 	return db.Save(r).Error
 }

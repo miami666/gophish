@@ -3,6 +3,18 @@ var doPoll = true;
 
 // statuses is a helper map to point result statuses to ui classes
 var statuses = {
+    "HTML Opened": {
+        color:"#FF0000",
+        label: "label-danger",
+        icon: "fa-file",
+        point: "ct-point-opened"
+    },
+    "WORD Opened": {
+        color: "#FF0000",
+        label: "label-danger",
+        icon: "fa-file",
+        point: "ct-point-opened"
+    },
     "Email Sent": {
         color: "#1abc9c",
         label: "label-success",
@@ -103,15 +115,20 @@ var statusMapping = {
     "Clicked Link": "clicked",
     "Submitted Data": "submitted_data",
     "Email Reported": "reported",
+    "WORD Opened": "open",
+    "HTML Opened": "html",
 }
 
 // This is an underwhelming attempt at an enum
 // until I have time to refactor this appropriately.
 var progressListing = [
     "Email Sent",
+    "WORD Opened",
     "Email Opened",
     "Clicked Link",
-    "Submitted Data"
+    "Submitted Data",
+   
+    "HTML Opened",
 ]
 
 var campaign = {}

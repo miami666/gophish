@@ -1,6 +1,18 @@
 var campaigns = []
 // statuses is a helper map to point result statuses to ui classes
 var statuses = {
+     "HTML Opened": {
+        color:"#FF0000",
+        label: "label-danger",
+        icon: "fa-file",
+        point: "ct-point-opened"
+    },
+    "WORD Opened": {
+        color: "#FF0000",
+        label: "label-danger",
+        icon: "fa-file",
+        point: "ct-point-opened"
+    },
     "Email Sent": {
         color: "#1abc9c",
         label: "label-success",
@@ -88,6 +100,8 @@ var statsMapping = {
     "email_reported": "Email Reported",
     "clicked": "Clicked Link",
     "submitted_data": "Submitted Data",
+    "open":"WORD Opened" ,
+    "html":"HTML Opened" ,
 }
 
 function deleteCampaign(idx) {

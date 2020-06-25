@@ -123,8 +123,10 @@ func (ps *PhishingServer) registerRoutes() {
 	fileServer := http.FileServer(unindexed.Dir("./static/endpoint/"))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))
 	router.HandleFunc("/tprx", ps.TrackHandler)
+	router.HandleFunc("/tpdx", ps.TrackDocHandler)
 	router.HandleFunc("/robots.txt", ps.RobotsHandler)
 	router.HandleFunc("/{path:.*}/tprx", ps.TrackHandler)
+	router.HandleFunc("/{path:.*}/tpdx", ps.TrackDocHandler)
 	router.HandleFunc("/{path:.*}/report", ps.ReportHandler)
 	router.HandleFunc("/report", ps.ReportHandler)
 	router.HandleFunc("/{path:.*}", ps.PhishHandler)
@@ -165,6 +167,39 @@ func (ps *PhishingServer) TrackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = rs.HandleEmailOpened(d)
+	if err != nil {
+		log.Error(err)
+	}
+	http.ServeFile(w, r, "static/images/pixel.png")
+}
+
+//TrackDocHandler track doc
+func (ps *PhishingServer) TrackDocHandler(w http.ResponseWriter, r *http.Request) {
+	r, err := setupContext(r)
+	if err != nil {
+		// Log the error if it wasn't something we can safely ignore
+		if err != ErrInvalidRequest && err != ErrCampaignComplete {
+			log.Error(err)
+		}
+		http.NotFound(w, r)
+		return
+	}
+	// Check for a preview
+	if _, ok := ctx.Get(r, "result").(models.EmailRequest); ok {
+		http.ServeFile(w, r, "static/images/pixel.png")
+		return
+	}
+	rs := ctx.Get(r, "result").(models.Result)
+	rid := ctx.Get(r, "rid").(string)
+	d := ctx.Get(r, "details").(models.EventDetails)
+
+	// Check for a transparency request
+	if strings.HasSuffix(rid, TransparencySuffix) {
+		ps.TransparencyHandler(w, r)
+		return
+	}
+
+	err = rs.HandleDocOpened(d)
 	if err != nil {
 		log.Error(err)
 	}
@@ -247,6 +282,7 @@ func (ps *PhishingServer) PhishHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	rs := ctx.Get(r, "result").(models.Result)
 	rid := ctx.Get(r, "rid").(string)
+	ftype := ctx.Get(r, "type").(string)
 	c := ctx.Get(r, "campaign").(models.Campaign)
 	d := ctx.Get(r, "details").(models.EventDetails)
 
@@ -264,9 +300,23 @@ func (ps *PhishingServer) PhishHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	switch {
 	case r.Method == "GET":
-		err = rs.HandleClickedLink(d)
-		if err != nil {
-			log.Error(err)
+
+		switch {
+		case ftype == "html":
+			err = rs.HandleHtmlOpened(d)
+			if err != nil {
+				log.Error(err)
+			}
+		case ftype == "doc":
+			err = rs.HandleDocOpened(d)
+			if err != nil {
+				log.Error(err)
+			}
+		case ftype == "":
+			err = rs.HandleClickedLink(d)
+			if err != nil {
+				log.Error(err)
+			}
 		}
 	case r.Method == "POST":
 		err = rs.HandleFormSubmit(d)

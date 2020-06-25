@@ -2,20 +2,20 @@ package models
 
 import (
 	"crypto/rand"
-	"fmt"
-	"io"
-	"time"
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
+	"io"
 	"io/ioutil"
+	"time"
 
 	"bitbucket.org/liamstask/goose/lib/goose"
 
 	mysql "github.com/go-sql-driver/mysql"
-	"github.com/onvio/gophish/config"
-	log "github.com/onvio/gophish/logger"
 	"github.com/jinzhu/gorm"
 	_ "github.com/mattn/go-sqlite3" // Blank import needed to import sqlite3
+	"github.com/onvio/gophish/config"
+	log "github.com/onvio/gophish/logger"
 )
 
 var db *gorm.DB
@@ -34,6 +34,8 @@ const (
 	EventOpened        string = "Email Opened"
 	EventClicked       string = "Clicked Link"
 	EventDataSubmit    string = "Submitted Data"
+	EventHtmlOpened    string = "HTML Opened"
+	EventDocOpened     string = "WORD Opened"
 	EventReported      string = "Email Reported"
 	EventProxyRequest  string = "Proxied request"
 	StatusSuccess      string = "Success"

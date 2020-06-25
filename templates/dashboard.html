@@ -18,6 +18,7 @@
         <div class="row">
             <div style="height:200px;" class="col-lg-1 col-md-1"></div>
             <div id="sent_chart" style="height:200px;" class="col-lg-2 col-md-2"></div>
+            <div id="open_chart" style="height:200px;" class="col-lg-2 col-md-2"></div>
             <div id="opened_chart" style="height:200px;" class="col-lg-2 col-md-2"></div>
             <div id="clicked_chart" style="height:200px;" class="col-lg-2 col-md-2"></div>
             <div id="submitted_data_chart" style="height:200px;" class="col-lg-2 col-md-2"></div>
@@ -42,6 +43,7 @@
                         <th class="col-md-1 col-sm-1">
                             <i class="fa fa-envelope-o"></i>
                         </th>
+                        
                         <th class="col-md-1 col-sm-1">
                             <i class="fa fa-envelope-open-o"></i>
                         </th>
@@ -65,5 +67,5 @@
     </div>
 </div>
 {{end}} {{define "scripts"}}
-<script src="/js/dist/app/dashboard.min.js"></script>
+<script src="/js/src/app/dashboard.js"></script>
 {{end}}

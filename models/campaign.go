@@ -5,8 +5,8 @@ import (
 	"net/url"
 	"time"
 
-	log "github.com/onvio/gophish/logger"
 	"github.com/jinzhu/gorm"
+	log "github.com/onvio/gophish/logger"
 	"github.com/sirupsen/logrus"
 )
 
@@ -64,6 +64,8 @@ type CampaignStats struct {
 	Total         int64 `json:"total"`
 	EmailsSent    int64 `json:"sent"`
 	OpenedEmail   int64 `json:"opened"`
+	DocOpened     int64 `json:"open"`
+	HtmlOpened    int64 `json:"html"`
 	ClickedLink   int64 `json:"clicked"`
 	SubmittedData int64 `json:"submitted_data"`
 	EmailReported int64 `json:"email_reported"`
@@ -259,6 +261,10 @@ func getCampaignStats(cid int64) (CampaignStats, error) {
 	if err != nil {
 		return s, err
 	}
+	query.Where("status=?", EventDocOpened).Count(&s.DocOpened)
+	if err != nil {
+		return s, err
+	}
 	query.Where("status=?", EventClicked).Count(&s.ClickedLink)
 	if err != nil {
 		return s, err
@@ -281,6 +287,7 @@ func getCampaignStats(cid int64) (CampaignStats, error) {
 	}
 	// Every opened email event implies the email was sent
 	s.EmailsSent += s.OpenedEmail
+
 	err = query.Where("status=?", Error).Count(&s.Error).Error
 	return s, err
 }
