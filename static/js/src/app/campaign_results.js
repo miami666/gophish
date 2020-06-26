@@ -127,7 +127,6 @@ var progressListing = [
     "Email Opened",
     "Clicked Link",
     "Submitted Data",
-   
     "HTML Opened",
 ]
 
