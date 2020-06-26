@@ -374,7 +374,7 @@ $(document).ready(function () {
                         campaign.stats.submitted_data,
                         campaign.stats.email_reported,
                  
-                        "<span class=\"label " + label + "\" data-toggle=\"tooltip\" data-placement=\"right\" data-html=\"true\" title=\"" + quickStats + "\">" + campaign.status + "</span>",
+                        "<span class=\"label " + label + "\" data-toggle=\"tooltip\" data-placement=\"left\" data-html=\"true\" title=\"" + quickStats + "\">" + campaign.status + "</span>",
                         "<div class='pull-right'><a class='btn btn-primary' href='/campaigns/" + campaign.id + "' data-toggle='tooltip' data-placement='left' title='View Results'>\
                     <i class='fa fa-bar-chart'></i>\
                     </a>\
