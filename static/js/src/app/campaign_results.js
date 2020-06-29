@@ -123,11 +123,10 @@ var statusMapping = {
 // until I have time to refactor this appropriately.
 var progressListing = [
     "Email Sent",
-    "WORD Opened",
     "Email Opened",
     "Clicked Link",
     "Submitted Data",
-    "HTML Opened",
+
 ]
 
 var campaign = {}
@@ -685,6 +684,9 @@ function poll() {
                 email_series_data[result.status]++;
                 if (result.reported) {
                     email_series_data['Email Reported']++
+                }
+                if (result.open) {
+                    email_series_data['WORD opened']++
                 }
                 // Backfill status values
                 var step = progressListing.indexOf(result.status)
