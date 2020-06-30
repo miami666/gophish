@@ -122,7 +122,7 @@ var statusMapping = {
 // This is an underwhelming attempt at an enum
 // until I have time to refactor this appropriately.
 var progressListing = [
-   
+    "Email Sent",
     "Email Opened",
     "Clicked Link",
     "Submitted Data",
