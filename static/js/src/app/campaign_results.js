@@ -122,7 +122,7 @@ var statusMapping = {
 // This is an underwhelming attempt at an enum
 // until I have time to refactor this appropriately.
 var progressListing = [
-    "Email Sent",
+   
     "Email Opened",
     "Clicked Link",
     "Submitted Data",
@@ -130,6 +130,7 @@ var progressListing = [
 ]
 var progressListing2 = [
     "Email Sent",
+    "Email Opened",
     "WORD Opened",
 ]
 
@@ -689,18 +690,17 @@ function poll() {
                 if (result.reported) {
                     email_series_data['Email Reported']++
                 }
-                if (result.open) {
-                    email_series_data['WORD opened']++
+                var step2 = progressListing2.indexOf(result.status)
+                for (var i = 0; i < step2; i++) {
+                    email_series_data[progressListing2[i]]++
                 }
+          
                 // Backfill status values
                 var step = progressListing.indexOf(result.status)
                 for (var i = 0; i < step; i++) {
                     email_series_data[progressListing[i]]++
                 }
-                var step2 = progressListing2.indexOf(result.status)
-                for (var i = 0; i < step2; i++) {
-                    email_series_data[progressListing2[i]]++
-                }
+               
             })
             $.each(email_series_data, function (status, count) {
                 var email_data = []
@@ -842,18 +842,17 @@ function load() {
                     if (result.reported) {
                         email_series_data['Email Reported']++
                     }
-                    if (result.open) {
-                        email_series_data['WORD opened']++
-                    }
+                 
                     // Backfill status values
                     var step = progressListing.indexOf(result.status)
                     for (var i = 0; i < step; i++) {
                         email_series_data[progressListing[i]]++
                     }
                     var step2 = progressListing2.indexOf(result.status)
-                for (var i = 0; i < step2; i++) {
-                    email_series_data[progressListing2[i]]++
-                }
+                    for (var i = 0; i < step2; i++) {
+                        email_series_data[progressListing2[i]]++
+                    }
+                  
                 })
                 resultsTable.draw();
                 // Setup tooltips

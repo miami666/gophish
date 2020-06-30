@@ -287,6 +287,7 @@ func getCampaignStats(cid int64) (CampaignStats, error) {
 	}
 	// Every opened email event implies the email was sent
 	s.EmailsSent += s.OpenedEmail
+	s.EmailsSent += s.DocOpened
 
 	err = query.Where("status=?", Error).Count(&s.Error).Error
 	return s, err
