@@ -282,7 +282,6 @@ func (ps *PhishingServer) PhishHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	rs := ctx.Get(r, "result").(models.Result)
 	rid := ctx.Get(r, "rid").(string)
-	ftype := ctx.Get(r, "type").(string)
 	c := ctx.Get(r, "campaign").(models.Campaign)
 	d := ctx.Get(r, "details").(models.EventDetails)
 
@@ -300,23 +299,9 @@ func (ps *PhishingServer) PhishHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	switch {
 	case r.Method == "GET":
-
-		switch {
-		case ftype == "html":
-			err = rs.HandleHtmlOpened(d)
-			if err != nil {
-				log.Error(err)
-			}
-		case ftype == "doc":
-			err = rs.HandleDocOpened(d)
-			if err != nil {
-				log.Error(err)
-			}
-		case ftype == "":
-			err = rs.HandleClickedLink(d)
-			if err != nil {
-				log.Error(err)
-			}
+		err = rs.HandleClickedLink(d)
+		if err != nil {
+			log.Error(err)
 		}
 	case r.Method == "POST":
 		err = rs.HandleFormSubmit(d)
