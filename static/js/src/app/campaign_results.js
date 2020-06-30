@@ -698,7 +698,7 @@ function poll() {
                     email_series_data[progressListing[i]]++
                 }
                 var step2 = progressListing2.indexOf(result.status)
-                for (var i = 0; i < step; i++) {
+                for (var i = 0; i < step2; i++) {
                     email_series_data[progressListing2[i]]++
                 }
             })
@@ -851,7 +851,7 @@ function load() {
                         email_series_data[progressListing[i]]++
                     }
                     var step2 = progressListing2.indexOf(result.status)
-                for (var i = 0; i < step; i++) {
+                for (var i = 0; i < step2; i++) {
                     email_series_data[progressListing2[i]]++
                 }
                 })
