@@ -9,6 +9,11 @@ import (
 	"time"
 
 	"github.com/NYTimes/gziphandler"
+	"github.com/gorilla/csrf"
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
+	"github.com/jordan-wright/unindexed"
 	"github.com/onvio/gophish/auth"
 	"github.com/onvio/gophish/config"
 	ctx "github.com/onvio/gophish/context"
@@ -18,11 +23,6 @@ import (
 	"github.com/onvio/gophish/models"
 	"github.com/onvio/gophish/util"
 	"github.com/onvio/gophish/worker"
-	"github.com/gorilla/csrf"
-	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
-	"github.com/gorilla/sessions"
-	"github.com/jordan-wright/unindexed"
 )
 
 // AdminServerOption is a functional option that is used to configure the
@@ -105,6 +105,7 @@ func (as *AdminServer) registerRoutes() {
 	router.HandleFunc("/sending_profiles", mid.Use(as.SendingProfiles, mid.RequireLogin))
 	router.HandleFunc("/settings", mid.Use(as.Settings, mid.RequireLogin))
 	router.HandleFunc("/users", mid.Use(as.UserManagement, mid.RequirePermission(models.PermissionModifySystem), mid.RequireLogin))
+	router.HandleFunc("/impersonate", mid.Use(as.Impersonate, mid.RequirePermission(models.PermissionModifySystem), mid.RequireLogin))
 	// Create the API routes
 	api := api.NewServer(api.WithWorker(as.worker))
 	router.PathPrefix("/api/").Handler(api)
@@ -231,6 +232,24 @@ func (as *AdminServer) UserManagement(w http.ResponseWriter, r *http.Request) {
 	params := newTemplateParams(r)
 	params.Title = "User Management"
 	getTemplate(w, "users").ExecuteTemplate(w, "base", params)
+}
+
+// Impersonate allows an admin to login to a user account without needing the password
+func (as *AdminServer) Impersonate(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method == "POST" {
+		username := r.FormValue("username")
+		u, err := models.GetUserByUsername(username)
+		if err != nil {
+			log.Error(err)
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		session := ctx.Get(r, "session").(*sessions.Session)
+		session.Values["id"] = u.Id
+		session.Save(r, w)
+	}
+	http.Redirect(w, r, "/", 302)
 }
 
 // Login handles the authentication flow for a user. If credentials are valid,
