@@ -1,6 +1,6 @@
-$(document).ready(function(){
+
 $( "#resultsTable tbody td.details-control" ).trigger( "click" );
-});
+
 
 var emailSent="Email Sent";
 var countEmailSent=$('.timeline-message').filter(function() {
