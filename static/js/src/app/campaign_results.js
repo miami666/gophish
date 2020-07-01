@@ -1,3 +1,6 @@
+
+
+
 var map = null
 var doPoll = true;
 
@@ -7,13 +10,13 @@ var statuses = {
         color:"#FF0000",
         label: "label-danger",
         icon: "fa-file",
-        point: "ct-point-opened"
+        point: "ct-point-html"
     },
     "WORD Opened": {
         color: "#FF0000",
         label: "label-danger",
         icon: "fa-file",
-        point: "ct-point-opened"
+        point: "ct-point-open"
     },
     "Email Sent": {
         color: "#1abc9c",
@@ -126,10 +129,12 @@ var progressListing = [
     "Email Opened",
     "Clicked Link",
     "Submitted Data",
+  
+  
 
 ]
 var progressListing2 = [
-    "Email Sent",
+ 
     "Email Opened",
     "WORD Opened",
 ]
@@ -690,16 +695,26 @@ function poll() {
                 if (result.reported) {
                     email_series_data['Email Reported']++
                 }
-                var step2 = progressListing2.indexOf(result.status)
+                if(result.status=="WORD Opened") {
+                    //alert('word opened');
+                    email_series_data['Email Sent']++
+                    email_series_data['Email Opened']++
+                   
+                } 
+             
+              /*   var step2 = progressListing2.indexOf(result.status)
                 for (var i = 0; i < step2; i++) {
                     email_series_data[progressListing2[i]]++
                 }
+          */
           
                 // Backfill status values
                 var step = progressListing.indexOf(result.status)
+               
                 for (var i = 0; i < step; i++) {
                     email_series_data[progressListing[i]]++
                 }
+           
                
             })
             $.each(email_series_data, function (status, count) {
@@ -842,17 +857,22 @@ function load() {
                     if (result.reported) {
                         email_series_data['Email Reported']++
                     }
+                    if(result.status=="WORD Opened") {
+                        //alert('word opened');
+                        email_series_data['Email Sent']++
+                        email_series_data['Email Opened']++
+                    }
                  
                     // Backfill status values
                     var step = progressListing.indexOf(result.status)
                     for (var i = 0; i < step; i++) {
                         email_series_data[progressListing[i]]++
                     }
-                    var step2 = progressListing2.indexOf(result.status)
+                  /*   var step2 = progressListing2.indexOf(result.status)
                     for (var i = 0; i < step2; i++) {
                         email_series_data[progressListing2[i]]++
                     }
-                  
+                   */
                 })
                 resultsTable.draw();
                 // Setup tooltips
@@ -942,6 +962,8 @@ function load() {
             $("#loading").hide()
             errorFlash(" Campaign not found!")
         })
+       
+            
 }
 
 var setRefresh
@@ -970,3 +992,5 @@ $(document).ready(function () {
     // Start the polling loop
     setRefresh = setTimeout(refresh, 60000)
 })
+
+   
