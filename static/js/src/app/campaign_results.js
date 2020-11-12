@@ -141,6 +141,56 @@ var progressListing2 = [
 
 var campaign = {}
 var bubbles = []
+Highcharts.getSVG = function(charts) {
+    var svgArr = [],
+      top = 0,
+      width = 0;
+  
+    Highcharts.each(charts, function(chart) {
+      var svg = chart.getSVG(),
+        // Get width/height of SVG for export
+        svgWidth = +svg.match(
+          /^<svg[^>]*width\s*=\s*\"?(\d+)\"?[^>]*>/
+        )[1],
+        svgHeight = +svg.match(
+          /^<svg[^>]*height\s*=\s*\"?(\d+)\"?[^>]*>/
+        )[1];
+  
+      svg = svg.replace(
+        '<svg',
+        '<g transform="translate('+width+', 0 )" '
+      );
+      svg = svg.replace('</svg>', '</g>');
+  
+      width += svgWidth;
+          top = Math.max(top, svgHeight);
+      
+      svgArr.push(svg);
+    });
+  
+    return '<svg height="' + top + '" width="' + width +
+      '" version="1.1" xmlns="http://www.w3.org/2000/svg">' +
+      svgArr.join('') + '</svg>';
+  };
+  
+  /**
+   * Create a global exportCharts method that takes an array of charts as an
+   * argument, and exporting options as the second argument
+   */
+  Highcharts.exportCharts = function(charts, options) {
+  
+    // Merge the options
+    options = Highcharts.merge(Highcharts.getOptions().exporting, options);
+  
+    // Post to export server
+    Highcharts.post(options.url, {
+      filename: options.filename || 'chart',
+      type: options.type,
+      width: options.width,
+      svg: Highcharts.getSVG(charts)
+    });
+  };
+
 
 function dismiss() {
     $("#modal\\.flashes").empty()
@@ -540,6 +590,10 @@ var renderTimelineChart = function (chartopts) {
 /* Renders a pie chart using the provided chartops */
 var renderPieChart = function (chartopts) {
     return Highcharts.chart(chartopts['elemId'], {
+   
+           
+       
+    
         chart: {
             type: 'pie',
             events: {
@@ -565,6 +619,8 @@ var renderPieChart = function (chartopts) {
                 }
             }
         },
+    
+
         title: {
             text: chartopts['title']
         },
@@ -579,6 +635,11 @@ var renderPieChart = function (chartopts) {
         credits: {
             enabled: false
         },
+        exporting: {
+              
+            },
+          
+    
         tooltip: {
             formatter: function () {
                 if (this.key == undefined) {
@@ -593,6 +654,85 @@ var renderPieChart = function (chartopts) {
         }]
     })
 }
+
+
+const toDataURL = url => fetch(url)
+  .then(response => response.blob())
+  .then(blob => new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result)
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
+  }));
+
+
+$('#btn').click(function() {
+  var charts = Highcharts.charts,
+    exportUrl = 'https://export.highcharts.com/',
+    doc = new jsPDF(),
+    pageHeight = doc.internal.pageSize.getHeight(),
+    ajaxCalls = [],
+    promises = [],
+    yDocPos = 0,
+    k = 0,
+    chart,
+    imgUrl,
+    i,
+    j;
+
+  for (i = 0; i < charts.length; i++) {
+    chart = charts[i];
+    
+    ajaxCalls.push($.ajax({
+      type: 'post',
+      url: exportUrl,
+      data: {
+        options: JSON.stringify(chart.userOptions),
+        type: 'image/png',
+        async: true
+      }
+    }));
+  }
+
+  $.when.apply(null, ajaxCalls).done(function() {
+
+    for (j = 0; j < arguments.length; j++) {
+      imgUrl = exportUrl + arguments[j][0];
+      promises[j] = toDataURL(imgUrl);
+    }
+
+    Promise.all(promises).then((values) => {
+      values.forEach((value, index) => {
+      	var page = doc.internal.getCurrentPageInfo();
+        if (yDocPos > pageHeight - 150) {
+          doc.addPage();
+          yDocPos = 25;
+          k = 0;
+        } else {
+        	yDocPos = 25 + k * 140;
+        }
+
+        doc.setFontSize(30);
+        doc.text(50, yDocPos, 'jspdf title for Chart' + (index + 1));
+        
+        yDocPos += 15;
+        doc.addImage(value, 'PNG', 20, yDocPos);
+        
+        k++;
+      });
+      doc.save('charts.pdf');
+    });
+  });
+});
+$('#export-png').click(function() {
+    Highcharts.exportCharts([chart1, chart2]);
+  });
+  
+  $('#export-pdf').click(function() {
+    Highcharts.exportCharts([sent_chart], {
+      type: 'application/pdf'
+    });
+  });
 
 /* Updates the bubbles on the map
 

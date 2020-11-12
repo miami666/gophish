@@ -27,6 +27,7 @@ _testmain.go
 
 gophish_admin.crt
 gophish_admin.key
+*.doc
 
 *.exe
 gophish.db*

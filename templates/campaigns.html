@@ -110,6 +110,21 @@
                             </label>
                             <input type="text" class="form-control" id="send_by_date" />
                         </div>
+                        <div class="col-md-6">
+                           
+                        
+                                    
+                                    <div class="example7"></div>
+                                    <input id="cron_schedule" class="example7-input form-control" />
+                             
+                           
+                        </div>
+                        <div class="col-md-6">
+                            <label class="control-label" for="delay">Send Emails By (Optional)
+                                <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="right" title="If specified, Gophish will send emails evenly between the campaign launch and this date."></i>
+                            </label>
+                            <input type="text" class="form-control" id="send_by_date_2" />
+                        </div>
                     </div>
                     <label class="control-label" for="profile">Sending Profile:</label>
                     <div class="input-group">
@@ -175,5 +190,9 @@
     </div>
 </div>
 {{end}} {{define "scripts"}}
-<script src="/js/dist/app/campaigns.min.js"></script>
+<!--<script src="/js/dist/app/campaigns.min.js"></script>-->
+<script src="/js/src/app/campaigns.js"></script>
+<script src="/js/src/vendor/jqcron/jqCron.js"></script>
+<script src="/js/src/vendor/jqcron/jqCron.en.js"></script>
+
 {{end}}

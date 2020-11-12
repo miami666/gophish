@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/gorhill/cronexpr"
 	"github.com/jinzhu/gorm"
 	log "github.com/onvio/gophish/logger"
 	"github.com/sirupsen/logrus"
@@ -15,6 +16,7 @@ type Campaign struct {
 	Id            int64     `json:"id"`
 	UserId        int64     `json:"-"`
 	Name          string    `json:"name" sql:"not null"`
+	CronSchedule  string    `json:"cron_schedule"`
 	CreatedDate   time.Time `json:"created_date"`
 	LaunchDate    time.Time `json:"launch_date"`
 	SendByDate    time.Time `json:"send_by_date"`
@@ -227,25 +229,33 @@ func (c *Campaign) getFromAddress() string {
 	return c.SMTP.FromAddress
 }
 
-// generateSendDate creates a sendDate
+// generateSendDate erstellt zeitliche automatisch gesteuerten Versand von Phishing Wellen
 func (c *Campaign) generateSendDate(idx int, totalRecipients int) time.Time {
-	// If no send date is specified, just return the launch date
-	if c.SendByDate.IsZero() || c.SendByDate.Equal(c.LaunchDate) {
-		return c.LaunchDate
+	// check wether cron expression Parser returns a valid time
+	// mit cron expression parser prüfen ob das Eingabefeld der erstellten Phishing Kampagne eine valide Zeit zurückgibt
+	if cronexpr.MustParse(c.CronSchedule).Next(time.Now()).IsZero() {
+		// If no send date is specified, just return the launch date
+		if c.SendByDate.IsZero() || c.SendByDate.Equal(c.LaunchDate) {
+			return c.LaunchDate
+		}
+
+		// Otherwise, we can calculate the range of minutes to send emails
+		// (since we only poll once per minute)
+		totalMinutes := c.SendByDate.Sub(c.LaunchDate).Minutes()
+
+		// Next, we can determine how many minutes should elapse between emails
+		minutesPerEmail := totalMinutes / float64(totalRecipients)
+
+		// Then, we can calculate the offset for this particular email
+		offset := int(minutesPerEmail * float64(idx))
+
+		// Finally, we can just add this offset to the launch date to determine
+		// when the email should be sent
+		return c.LaunchDate.Add(time.Duration(offset) * time.Minute)
 	}
-	// Otherwise, we can calculate the range of minutes to send emails
-	// (since we only poll once per minute)
-	totalMinutes := c.SendByDate.Sub(c.LaunchDate).Minutes()
-
-	// Next, we can determine how many minutes should elapse between emails
-	minutesPerEmail := totalMinutes / float64(totalRecipients)
-
-	// Then, we can calculate the offset for this particular email
-	offset := int(minutesPerEmail * float64(idx))
-
-	// Finally, we can just add this offset to the launch date to determine
-	// when the email should be sent
-	return c.LaunchDate.Add(time.Duration(offset) * time.Minute)
+	//im Falle das cron expression parser eine valide Eingabe enthält über NextN das Versanddatum für N Gesamtempfänger erstellen und über den index den passenden Rückgabewert zuordnen
+	sendTime := cronexpr.MustParse(c.CronSchedule).NextN(c.LaunchDate, uint(totalRecipients))
+	return sendTime[idx]
 }
 
 // getCampaignStats returns a CampaignStats object for the campaign with the given campaign ID.
@@ -416,6 +426,7 @@ func PostCampaign(c *Campaign, uid int64) error {
 	}
 	// Fill in the details
 	c.UserId = uid
+
 	c.CreatedDate = time.Now().UTC()
 	c.CompletedDate = time.Time{}
 	c.Status = CampaignQueued

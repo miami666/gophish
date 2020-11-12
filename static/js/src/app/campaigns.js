@@ -37,6 +37,7 @@ function launch() {
                 if (send_by_date != "") {
                     send_by_date = moment(send_by_date, "MMMM Do YYYY, h:mm a").utc().format()
                 }
+                var cron_schedule = $("#cron_schedule").val()
                 campaign = {
                     name: $("#name").val(),
                     template: {
@@ -51,6 +52,7 @@ function launch() {
                     },
                     launch_date: moment($("#launch_date").val(), "MMMM Do YYYY, h:mm a").utc().format(),
                     send_by_date: send_by_date || null,
+                    cron_schedule: cron_schedule || null,
                     groups: groups,
                 }
                 // Submit the campaign
@@ -304,6 +306,29 @@ $(document).ready(function () {
         "useCurrent": false,
         "format": "MMMM Do YYYY, h:mm a"
     })
+
+    //jqCron
+    $(function(){
+        $('.example7').jqCron({
+            enabled_minute: true,
+            multiple_dom: true,
+            multiple_month: true,
+            multiple_mins: true,
+            multiple_dow: true,
+            multiple_time_hours: true,
+            multiple_time_minutes: true,
+            default_period: 'week',
+            default_value: '*/5 9-17 * * *',
+            bind_to: $('.example7-input'),
+            bind_method: {
+                set: function($element, value) {
+                    $element.val(value);
+                }
+            },
+            no_reset_button: false,
+            lang: 'en'
+        });
+    });
     // Setup multiple modals
     // Code based on http://miles-by-motorcycle.com/static/bootstrap-modal/index.html
     $('.modal').on('hidden.bs.modal', function (event) {

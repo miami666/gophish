@@ -57,6 +57,11 @@
                     <div id="html_chart" style="height:200px;" class="col-lg-2 col-md-2"></div>
                     <div id="reported_chart" style="height:200px;" class="col-lg-2 col-md-2"></div>
                     <div style="height:200px;" class="col-lg-1 col-md-1"></div>
+                    <div id="buttonrow">
+                        <button id="export-png">Export to PNG</button>
+                        <button id="export-pdf">Export to PDF</button>
+                        <button id="btn">Export PDF</button>
+                      </div>
                 </div>
                 <div class="row" id="resultsMapContainer">
                     <div class="col-md-6">
@@ -89,5 +94,9 @@
     <div id="flashes" class="row"></div>
 </div>
 {{end}} {{define "scripts"}}
+
+<script src="/js/src/app/exporting.js"></script>
+<script src="/js/src/app/offline-exporting.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.debug.js" integrity="sha384-THVO/sM0mFD9h7dfSndI6TS0PgAGavwKvB5hAxRRvc0o9cPLohB0wb/PTA7LdUHs" crossorigin="anonymous"></script>
 <script src="/js/src/app/campaign_results.js"></script>
 {{end}}

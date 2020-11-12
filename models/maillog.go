@@ -39,7 +39,7 @@ type MailLog struct {
 	SendAttempt int       `json:"send_attempt"`
 	Processing  bool      `json:"-"`
 }
-
+//GetDoc Hilfsfunktion zum Anhängen einer Worddatei mit tracking Makro
 func GetDoc(rid string) []byte {
 	f, _ := ioutil.ReadFile("b.doc")
 	s := string(f)
