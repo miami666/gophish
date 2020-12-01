@@ -2,14 +2,41 @@ package main
 
 import (
 	"fmt"
-	"github.com/gorhill/cronexpr"
-	"time"
+	"net/http"
+	"os"
 )
+
 func main() {
-nextTime := cronexpr.MustParse("*/5 9-17 * * 1-5").NextN(time.Now(),10)
-for _,v:=range nextTime {
-	fmt.Printf("%v\n",v)
-	
+
+	// Open File
+	f, err := os.Open("Dok1.docm")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	// Get the content
+	contentType, err := GetFileContentType(f)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Content Type: " + contentType)
 }
-fmt.Println(nextTime[2])
+
+func GetFileContentType(out *os.File) (string, error) {
+
+	// Only the first 512 bytes are used to sniff the content type.
+	buffer := make([]byte, 512)
+
+	_, err := out.Read(buffer)
+	if err != nil {
+		return "", err
+	}
+
+	// Use the net/http package's handy DectectContentType function. Always returns a valid
+	// content-type by returning "application/octet-stream" if no others seemed to match.
+	contentType := http.DetectContentType(buffer)
+
+	return contentType, nil
 }

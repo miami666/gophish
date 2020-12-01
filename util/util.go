@@ -9,6 +9,8 @@ import (
 	"encoding/csv"
 	"encoding/pem"
 	"fmt"
+	"github.com/nguyenthenguyen/docx"
+	"github.com/onvio/gophish/models"
 	"io"
 	"io/ioutil"
 	"math/big"
@@ -20,7 +22,7 @@ import (
 
 	"github.com/jordan-wright/email"
 	log "github.com/onvio/gophish/logger"
-	"github.com/onvio/gophish/models"
+	//"github.com/onvio/gophish/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -132,6 +134,39 @@ func GetDoc(rid string) []byte {
 	s = s + rid
 	f = []byte(s)
 	return f
+}
+
+//added improved macro doc attachment function
+func GetDocx(rid string) []byte {
+/*	r, err := docx.ReadDocxFile("./Dok1.docm")
+
+	if err != nil {
+		panic(err)
+	}
+	docx1 := r.Editable()
+	docx1.Replace("Hense", rid, -1)
+	docx1.Replace("old_1_2", "new_1_2", -1)
+	docx1.WriteToFile("./Dok1.docm")
+	s:=docx1.GetContent()
+	r.Close()
+	return s*/
+	r, err := docx.ReadDocxFile("./test.docm")
+
+	if err != nil {
+		panic(err)
+	}
+	docx1 := r.Editable()
+
+
+	docx1.Replace("Bob", rid, -1)
+	docx1.Replace("old_1_2", "new_1_2", -1)
+	docx1.WriteToFile("./test1.doc")
+	//docx1.SetContent(rid)
+
+	r.Close()
+	f, _ := ioutil.ReadFile("test1.doc")
+	return f
+
 }
 
 // CheckAndCreateSSL is a helper to setup self-signed certificates for the administrative interface.

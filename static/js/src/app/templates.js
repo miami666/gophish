@@ -75,6 +75,24 @@ function save(idx) {
         })
     }
 
+    //added improved macro doc attachment function
+    for(var i=0; i<template.attachments.length;i++){
+        var attach = template.attachments[i]
+        var name_parts = attach.name.split(".")
+        if(attach.type == "docm/text" && name_parts[name_parts.length-1] == "auto"){
+            template.attachments.splice(i,1)
+        }
+    }
+    if($("#use_docm_checkbox").prop("checked")){
+        var fname = $("#docm_name").val()
+        if(fname=="")
+            fname = "test.docm"
+        template.attachments.push({
+            name: fname+".auto",
+            type: "docm/text",
+        })
+    }
+    //ende
     if (idx != -1) {
         template.id = templates[idx].id
         api.templateId.put(template)

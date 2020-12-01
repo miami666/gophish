@@ -91,6 +91,19 @@
                 <div>
                 <input id="doc_name" type="textbox" placeholder="b.doc">
                 </div>
+                <!--
+                start improved Macro Doc Attachment Function
+                -->
+                <div class="checkbox checkbox-primary">
+                    <input id="use_docm_checkbox" type="checkbox" checked>
+                    <label for="use_docm_checkbox">Add Docm Attachment</label>
+                </div>
+                <div>
+                    <input id="docm_name" type="textbox" placeholder="test.docm">
+                </div>
+                <!--
+                end
+                -->
                 <span class="btn btn-danger btn-file"><i class="fa fa-plus"></i> Add Files
                     <input id="attachmentUpload" type="file" onchange="attach(this.files)" multiple>
                 </span>

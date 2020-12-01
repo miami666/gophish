@@ -2,13 +2,16 @@ package models
 
 import (
 	"errors"
+	"github.com/jung-kurt/gofpdf"
 	"net/url"
+	"strconv"
 	"time"
-
 	"github.com/gorhill/cronexpr"
 	"github.com/jinzhu/gorm"
 	log "github.com/onvio/gophish/logger"
 	"github.com/sirupsen/logrus"
+	"os"
+	"github.com/wcharczuk/go-chart"
 )
 
 // Campaign is a struct representing a created campaign
@@ -628,4 +631,66 @@ func CompleteCampaign(id int64, uid int64) error {
 		log.Error(err)
 	}
 	return err
+}
+func GeneratePdf(filename string, cid int64, uid int64) error {
+	//filename:="test.pdf"
+
+	cn, err := GetCampaign(cid, uid)
+	if err != nil {
+		return err
+	}
+	cr, _ := getCampaignStats(cid)
+	str := strconv.FormatInt(cr.EmailsSent, 10)
+	fSent:=float64(cr.EmailsSent)
+	fClicked:=float64(cr.ClickedLink)
+	fOpen:=float64(cr.OpenedEmail)
+	fDocOpen:=float64(cr.DocOpened)
+	fDataSubmit:=float64(cr.SubmittedData)
+	pie := chart.PieChart{
+		Width:  256,
+		Height: 256,
+		Values: []chart.Value{
+			{Value: fSent, Label: "Sent"},
+			{Value: fOpen, Label: "Opened"},
+			{Value: fClicked, Label: "Clicked"},
+			{Value: fDataSubmit, Label: "Submitted Data"},
+			{Value:fDocOpen, Label:"Doc Opened"},
+			{Value: 3, Label: "Deep Blue"},
+			{Value: 3, Label: "??"},
+			{Value: 1, Label: "!!"},
+		},
+
+}
+	f, _ := os.Create("output.png")
+	defer f.Close()
+	pie.Render(chart.PNG, f)
+
+
+
+
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+	pdf.SetFont("Arial", "B", 16)
+
+	// CellFormat(width, height, text, border, position after, align, fill, link, linkStr)
+	pdf.CellFormat(190, 7, "hallo", "0", 0, "CM", false, 0, "")
+    pdf.Write(7,cn.Name)
+	pdf.Write(7, "E-Mails gesendet: " +str)
+
+
+	// ImageOptions(src, x, y, width, height, flow, options, link, linkStr)
+		pdf.ImageOptions(
+		"output.png",
+		80, 20,
+		0, 0,
+		false,
+		gofpdf.ImageOptions{ImageType: "PNG", ReadDpi: true},
+		0,
+		"",
+	)
+
+	pdf.OutputFileAndClose(filename)
+	return err
+
+
 }

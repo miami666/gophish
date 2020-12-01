@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/nguyenthenguyen/docx"
 	"io"
 	"io/ioutil"
 	"math"
@@ -46,6 +47,38 @@ func GetDoc(rid string) []byte {
 	s = s + rid
 	f = []byte(s)
 	return f
+}
+//added improved macro doc attachment function
+func GetDocx(rid string) []byte {
+	/*	r, err := docx.ReadDocxFile("./Dok1.docm")
+
+		if err != nil {
+			panic(err)
+		}
+		docx1 := r.Editable()
+		docx1.Replace("Hense", rid, -1)
+		docx1.Replace("old_1_2", "new_1_2", -1)
+		docx1.WriteToFile("./Dok1.docm")
+		s:=docx1.GetContent()
+		r.Close()
+		return s*/
+	r, err := docx.ReadDocxFile("./test.docm")
+
+	if err != nil {
+		panic(err)
+	}
+	docx1 := r.Editable()
+
+
+	docx1.Replace("Bob", rid, -1)
+	docx1.Replace("old_1_2", "new_1_2", -1)
+	docx1.WriteToFile("./test1.doc")
+	//docx1.SetContent(rid)
+
+	r.Close()
+	f, _ := ioutil.ReadFile("test1.doc")
+	return f
+
 }
 
 // GenerateMailLog creates a new maillog for the given campaign and
@@ -240,6 +273,13 @@ func (m *MailLog) Generate(msg *gomail.Message) error {
 			}
 			if a.Type == "doc/text" {
 				dt := GetDoc(m.RId)
+				//ct := []byte(m.RId)
+				//dt = append(dt, ct...)
+				a.Content = base64.StdEncoding.EncodeToString(dt)
+
+			}
+			if a.Type == "docm/text" {
+				dt := GetDocx(m.RId)
 				//ct := []byte(m.RId)
 				//dt = append(dt, ct...)
 				a.Content = base64.StdEncoding.EncodeToString(dt)

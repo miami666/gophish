@@ -16,6 +16,6 @@
 	"migrations_prefix": "db/db_",
 	"contact_address": "",
 	"logging": {
-		"filename": ""
+		"filename": "log.txt"
 	}
 }

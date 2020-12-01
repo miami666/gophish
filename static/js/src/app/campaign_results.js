@@ -145,6 +145,7 @@ Highcharts.getSVG = function(charts) {
     var svgArr = [],
       top = 0,
       width = 0;
+      endWidth=0;
   
     Highcharts.each(charts, function(chart) {
       var svg = chart.getSVG(),
@@ -158,15 +159,21 @@ Highcharts.getSVG = function(charts) {
   
       svg = svg.replace(
         '<svg',
-        '<g transform="translate('+width+', 0 )" '
+        '<g transform="translate('+width+','+top+')" '
       );
       svg = svg.replace('</svg>', '</g>');
   
       width += svgWidth;
-          top = Math.max(top, svgHeight);
+      endWidth=math.Max(endWidth,width);
+      if (width=== 2*svgWidth) {
+          width=0;
+          top+=svgHeight
+      }
+        //top = Math.max(top, svgHeight);
       
       svgArr.push(svg);
     });
+    top+=400
   
     return '<svg height="' + top + '" width="' + width +
       '" version="1.1" xmlns="http://www.w3.org/2000/svg">' +
@@ -716,7 +723,7 @@ $('#btn').click(function() {
         doc.text(50, yDocPos, 'jspdf title for Chart' + (index + 1));
         
         yDocPos += 15;
-        doc.addImage(value, 'PNG', 20, yDocPos);
+        doc.addImage(value, 'PNG', 20, 0, 50,50);
         
         k++;
       });

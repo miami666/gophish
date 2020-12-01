@@ -13,7 +13,7 @@ import (
 
 // SendTestEmail sends a test email using the template name
 // and Target given.
-func (as *Server) SendTestEmail(w http.ResponseWriter, r *http.Request) {
+func (as *Server) SendTestEmail (w http.ResponseWriter, r *http.Request) {
 	s := &models.EmailRequest{
 		ErrorChan: make(chan error),
 		UserId:    ctx.Get(r, "user_id").(int64),

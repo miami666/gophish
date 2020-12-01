@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/NYTimes/gziphandler"
@@ -99,6 +100,8 @@ func (as *AdminServer) registerRoutes() {
 	router.HandleFunc("/logout", mid.Use(as.Logout, mid.RequireLogin))
 	router.HandleFunc("/campaigns", mid.Use(as.Campaigns, mid.RequireLogin))
 	router.HandleFunc("/campaigns/{id:[0-9]+}", mid.Use(as.CampaignID, mid.RequireLogin))
+	router.HandleFunc("/campaigns-export/{id:[0-9]+}", mid.Use(as.GeneratePdfs, mid.RequireLogin))
+
 	router.HandleFunc("/templates", mid.Use(as.Templates, mid.RequireLogin))
 	router.HandleFunc("/groups", mid.Use(as.Groups, mid.RequireLogin))
 	router.HandleFunc("/landing_pages", mid.Use(as.LandingPages, mid.RequireLogin))
@@ -252,6 +255,7 @@ func (as *AdminServer) Impersonate(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", 302)
 }
 
+
 // Login handles the authentication flow for a user. If credentials are valid,
 // a session is created
 func (as *AdminServer) Login(w http.ResponseWriter, r *http.Request) {
@@ -315,6 +319,48 @@ func (as *AdminServer) Logout(w http.ResponseWriter, r *http.Request) {
 	session.Save(r, w)
 	http.Redirect(w, r, "/login", 302)
 }
+func (as *AdminServer) GeneratePdfs(w http.ResponseWriter, r *http.Request) {
+	params := newTemplateParams(r)
+	params.Title = "PDF"
+	t:=time.Kitchen
+	getTemplate(w, "pdf").ExecuteTemplate(w, "base", params)
+	filename := t+"_test.pdf"
+	vars := mux.Vars(r)
+	id, _ := strconv.ParseInt(vars["id"], 0, 64)
+	u := ctx.Get(r, "user").(models.User)
+
+	models.GeneratePdf(filename, id, u.Id)
+
+}
+
+/*	id := strings.TrimPrefix(r.URL.Path, "/campaigns/")
+	conId, _ :=strconv.ParseInt(id,0,64)
+
+	cr, _ :=models.GetCampaign(conId,ctx.Get(r,"user_id").(int64))
+	title:=cr.Name*/
+
+
+	/*pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+	pdf.SetFont("Arial", "B", 16)*/
+
+	// CellFormat(width, height, text, border, position after, align, fill, link, linkStr)
+	/*pdf.CellFormat(190, 7, "Welcome to golangcode.com", "0", 0, "CM", false, 0, "")*/
+
+	// ImageOptions(src, x, y, width, height, flow, options, link, linkStr)
+	/*	pdf.ImageOptions(
+		"avatar.jpg",
+		80, 20,
+		0, 0,
+		false,
+		gofpdf.ImageOptions{ImageType: "JPG", ReadDpi: true},
+		0,
+		"",
+	)*/
+
+	/*  pdf.OutputFileAndClose(filename)
+	http.Redirect(w, r, "/", 302)*/
+
 
 func getTemplate(w http.ResponseWriter, tmpl string) *template.Template {
 	templates := template.New("template")
@@ -333,3 +379,4 @@ func Flash(w http.ResponseWriter, r *http.Request, t string, m string) {
 		Message: m,
 	})
 }
+
